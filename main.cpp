@@ -15,7 +15,7 @@ int main() {
             }
         }
         else if (cs == 'c') {
-            if(!client()){
+            if(client() != 0){
                 break;
             }
         }
