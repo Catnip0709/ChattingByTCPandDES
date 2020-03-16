@@ -58,7 +58,7 @@ int client() {
         memset(sMsg, 0, sizeof(sMsg));
 
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n
-	    cin.getline(cMsg, sizeof(cMsg)); // 不用cin，因为不能含空格，fgets函数读取末尾带有\n
+	    cin.getline(cMsg, sizeof(cMsg)); // 不用cin，因为不能含空格
         if(strcmp(cMsg, "quit\n") == 0){
             break;
         }

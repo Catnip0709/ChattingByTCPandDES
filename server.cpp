@@ -70,7 +70,7 @@ int server() {
         cout << "Receive message form <" << clientAddr.sin_addr.s_addr << ">: " << cMsg << endl;
 
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n 
-        cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格，fgets函数读取末尾带有\n
+        cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
         if(strcmp(sMsg, "quit\n") == 0){
             break;
         }
