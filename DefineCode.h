@@ -12,3 +12,7 @@
 #define CLIENT_CONNECT_ERR  1012
 #define CLIENT_SEND_ERR     1013
 #define CLIENT_RECV_ERR     1014
+
+#define DES_ERR_BIT         1020
+#define INIT_REPLACE_IP     1021
+#define INVERSE_REPLACE_IP  1022

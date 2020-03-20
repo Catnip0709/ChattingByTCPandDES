@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include "cs.h"
-#include "ErrCode.h"
+#include "DefineCode.h"
 
 using namespace std;
 
