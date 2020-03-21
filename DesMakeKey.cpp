@@ -1,17 +1,13 @@
 #include <iostream>
 #include <string.h>
 #include <vector>
-#include "DES.h"
+#include "Des.h"
 #include "DefineCode.h"
 #include "HelpFunc.h"
 using namespace std;
 
 // 生成16个密钥中的每一个子密钥
-int CDesOperate:: MakeKey(vector<bool> initKey) {
-    if(initKey.size() != 64) {
-        return DES_ERR_BIT;
-    }
-
+vector<vector<bool>> CDesOperate:: MakeKey(vector<bool> initKey) {
     // (1) 置换选择PC-1：从 64bit 初始密钥中选出56bit有效位
     // 64 = 8位奇偶校验 + 左28 + 右28, int = 4字节 = 4*8位
     // 初始密钥的第8、16、24、32、40、48、56、64位是奇偶校验位，其他为有效位
@@ -43,6 +39,5 @@ int CDesOperate:: MakeKey(vector<bool> initKey) {
         }
     }
     
-    subKey = keyPC2;
-    return SUCCESS;
+    return keyPC2;
 }

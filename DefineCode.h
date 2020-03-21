@@ -13,6 +13,7 @@
 #define CLIENT_SEND_ERR     1013
 #define CLIENT_RECV_ERR     1014
 
+#define DES_KEY             "BLACKHAT"
 #define DES_ERR_BIT         1020
-#define INIT_REPLACE_IP     1021
-#define INVERSE_REPLACE_IP  1022
+#define INIT_REPLACE_IP     1021 // 初始置换IP
+#define INVERSE_REPLACE_IP  1022 // 逆初始置换IP

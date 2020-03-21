@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "cs.h"
 #include "DefineCode.h"
+#include "Des.h"
 
 using namespace std;
 
@@ -17,6 +18,8 @@ using namespace std;
 #define MAX_LINE 20
 
 int server() {
+    CDesOperate des; // DES对象
+
     char cMsg[MSG_SIZE], sMsg[MSG_SIZE];
 
     struct sockaddr_in serverAddr; // 一个将来与套接字绑定的结构体
@@ -74,6 +77,14 @@ int server() {
         if(strcmp(sMsg, "quit\n") == 0){
             break;
         }
+
+        string encryResult; // 加密结果
+        des.Encry(sMsg, DES_KEY, encryResult); // 加密
+        memset(sMsg, '\0', MSG_SIZE);
+        for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
+            sMsg[i] = encryResult[i];
+        }
+        sMsg[encryResult.size()] = '\0';
 
         if(send(fd_client, sMsg, MAX_LINE, sizeof(sMsg)) <= 0) { // （6）send将服务器的消息发给客户端
             perror("server send err");

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "cs.h"
 #include "DefineCode.h"
+#include "Des.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ using namespace std;
 #define DEFAULT_SERVER "127.0.0.1"
 
 int client() {
+    CDesOperate des; // DES对象
     char cMsg[MSG_SIZE], sMsg[MSG_SIZE];
 
     struct sockaddr_in serverAddr; // 一个将来与套接字绑定的结构体
@@ -62,6 +64,15 @@ int client() {
         if(strcmp(cMsg, "quit\n") == 0){
             break;
         }
+
+        string encryResult; // 加密结果
+        des.Encry(cMsg, DES_KEY, encryResult); // 加密
+        memset(cMsg, '\0', MSG_SIZE);
+        for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
+            cMsg[i] = encryResult[i];
+        }
+        cMsg[encryResult.size()] = '\0';
+
         if(send(fd_skt, cMsg, strlen(cMsg), 0) < 0) { // （3）send，客户端向服务端发消息
             perror("client send err");
             return CLIENT_SEND_ERR;

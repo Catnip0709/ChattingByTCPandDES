@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "DES.h"
+#include "Des.h"
 #include "HelpFunc.h"
 using namespace std;
 
@@ -8,6 +8,15 @@ using namespace std;
 DES的16轮迭代的细节相关实现
 f函数 = 选择扩展运算E + 密钥加运算 + 选择压缩运算S + 置换P
 */
+
+vector<bool> CDesOperate:: fFunc(vector<bool> input, vector<bool> key) {
+    vector<bool> fStep1 = EBox(input);
+    vector<bool> fStep2 = keyAddition(fStep1, key);
+    vector<bool> fStep3 = selectCompressionOperation(fStep2);
+    vector<bool> fStep4 = replacementOp(fStep3);
+    return fStep4;
+}
+
 
 //（1）选择扩展运算(E盒)：将输入的右边32bit扩展成为48bit输出
 vector<bool> CDesOperate:: EBox(vector<bool> input) {
@@ -20,11 +29,7 @@ vector<bool> CDesOperate:: EBox(vector<bool> input) {
 
 //（2）秘钥加运算：将选择扩展运算输出的48bit作为输入，与48bit的子密钥进行异或运算^
 vector<bool> CDesOperate:: keyAddition(vector<bool> input, vector<bool> key) {
-    vector<bool> output;
-    for (int i = 0; i < 48; i++) {
-        output.push_back(input[i] ^ key[i]);
-    }
-    return output;
+    return XOR(input, key);
 }
 
 //（3）选择压缩运算

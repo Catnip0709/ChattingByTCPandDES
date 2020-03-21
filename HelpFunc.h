@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "DefineCode.h"
 using namespace std;
 
 // 循环左移
@@ -40,4 +41,13 @@ vector<bool> from10To2(int decimal, int bit)  { // 参数2：将十进制decimal
         help = help << 1;
     }
     return result;
+}
+
+// 异或运算^
+vector<bool> XOR(vector<bool> input1, vector<bool> input2) {
+    vector<bool> output;
+    for (int i = 0; i < input1.size(); i++) {
+        output.push_back(input1[i] ^ input2[i]);
+    }
+    return output;
 }
