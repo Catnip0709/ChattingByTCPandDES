@@ -17,3 +17,5 @@
 #define DES_ERR_BIT         1020
 #define INIT_REPLACE_IP     1021 // 初始置换IP
 #define INVERSE_REPLACE_IP  1022 // 逆初始置换IP
+#define DES_ENCRY_ERR       1023 // 加密失败
+#define DES_DECRY_ERR       1024 // 解密失败

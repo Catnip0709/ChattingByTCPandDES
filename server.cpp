@@ -60,7 +60,7 @@ int server() {
             return SERVER_ACCEPT_ERR;
         }
         
-        cout << "server: got connection from " << clientAddr.sin_addr.s_addr
+        cout << "server: got connection from " << ntohl(clientAddr.sin_addr.s_addr)
              << ", port " << PORT
              << ", socket" << fd_client << endl;
 
@@ -71,21 +71,29 @@ int server() {
         }
         cMsg[cLen] = '\0';
 
-        cout<<"encry="<<cMsg<<endl;
-        cout<<"encry len = "<<strlen(cMsg)<<endl;
         string decryResult = "";
-        des.Decry(cMsg, DES_KEY, decryResult);
+        if (des.Decry(cMsg, DES_KEY, decryResult) != 0) { //解密
+            perror("decry err");
+            return DES_DECRY_ERR;
+        }
 
-        cout << "Receive message form <" << clientAddr.sin_addr.s_addr << ">: " << decryResult << endl;
+        cout << "Receive message form <" << ntohl(clientAddr.sin_addr.s_addr) << ">: "
+             << decryResult << endl;
 
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n 
         cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
         if(strcmp(sMsg, "quit\n") == 0) {
             break;
         }
+        
+        cout << "Send message to <" << ntohl(clientAddr.sin_addr.s_addr) << ">: " 
+             << sMsg << endl;
 
         string encryResult; // 加密结果
-        des.Encry(sMsg, DES_KEY, encryResult); // 加密
+        if (des.Encry(sMsg, DES_KEY, encryResult) != 0) { // 加密
+            perror("encry err");
+            return DES_ENCRY_ERR;
+        }
         memset(sMsg, '\0', MSG_SIZE);
         for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
             sMsg[i] = encryResult[i];
@@ -100,7 +108,6 @@ int server() {
         // >0表示成功，返回实际发送或接受的字节数
         // =0表示超时，对方主动关闭了连接过程
         // <0出错
-        cout << "Send message to <" << clientAddr.sin_addr.s_addr << ">: " << sMsg << endl;
 
         close(fd_client);
     }

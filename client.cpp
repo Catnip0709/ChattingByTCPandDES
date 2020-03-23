@@ -64,26 +64,25 @@ int client() {
         if(strcmp(cMsg, "quit\n") == 0){
             break;
         }
+        
+        cout << "Send message to <" << ntohl(serverAddr.sin_addr.s_addr) << ">: " << cMsg << endl;
 
         string encryResult; // 加密结果
-        des.Encry(cMsg, DES_KEY, encryResult); // 加密
+        if (des.Encry(cMsg, DES_KEY, encryResult) != 0) { // 加密
+            perror("encry err");
+            return DES_ENCRY_ERR;
+        }
         memset(cMsg, '\0', MSG_SIZE);
         for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
             cMsg[i] = encryResult[i];
         }
         cMsg[encryResult.size()] = '\0';
         
-        cout<<"test cMsg = "<<cMsg<<endl;
-        cout<<"encryResult size = "<<encryResult.length()<<endl;
-        cout<<"cMsg size = "<<strlen(cMsg)<<endl;
-
         if (send(fd_skt, cMsg, strlen(cMsg), 0) < 0) { // （3）send，客户端向服务端发消息
             perror("client send err");
             return CLIENT_SEND_ERR;
         }
-        cout << "Send message to <" << serverAddr.sin_addr.s_addr << ">: " << cMsg << endl;
         
-
         int sLen = recv(fd_skt, sMsg, sizeof(sMsg),0); // （4） recv，接收服务器发来的消息
         if(sLen <= 0) { 
             perror("client recv err");
@@ -92,9 +91,13 @@ int client() {
         sMsg[sLen] = '\0';
 
         string decryResult = "";
-        des.Decry(sMsg, DES_KEY, decryResult);
+        if (des.Decry(sMsg, DES_KEY, decryResult) != 0) { //解密
+            perror("decry err");
+            return DES_DECRY_ERR;
+        }
 
-        cout << "Receive message form <" << serverAddr.sin_addr.s_addr << ">: " << decryResult << endl;
+        cout << "Receive message form <" << ntohl(serverAddr.sin_addr.s_addr) << ">: " 
+             << decryResult << endl;
     }
     close(fd_skt);
 }

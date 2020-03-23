@@ -35,14 +35,7 @@ int CDesOperate::Decry(string cipherText, string key, string& decryResult) {
         }
         decryResult += tempResult;
     }
-
-    for(int i=0;i<binPlainText.size();i++){
-        for(int j=0;j<binPlainText[i].size();j++){
-            cout<<binPlainText[i][j];
-        }
-        cout<<endl;
-    }
-
+    
     return SUCCESS;
 }
 
