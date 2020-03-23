@@ -64,13 +64,19 @@ int server() {
              << ", port " << PORT
              << ", socket" << fd_client << endl;
 
-        int cLen = recv(fd_client, cMsg, MAX_LINE, sizeof(cMsg)); // （5）read将接收到的客户端消息存在cMsg中
+        int cLen = recv(fd_client, cMsg, sizeof(cMsg), 0); // （5）read将接收到的客户端消息存在cMsg中
         if (cLen <= 0) {
             perror("server recv err");
             return SERVER_RECV_ERR;
         }
         cMsg[cLen] = '\0';
-        cout << "Receive message form <" << clientAddr.sin_addr.s_addr << ">: " << cMsg << endl;
+
+        cout<<"encry="<<cMsg<<endl;
+        cout<<"encry len = "<<strlen(cMsg)<<endl;
+        string decryResult = "";
+        des.Decry(cMsg, DES_KEY, decryResult);
+
+        cout << "Receive message form <" << clientAddr.sin_addr.s_addr << ">: " << decryResult << endl;
 
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n 
         cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
@@ -80,14 +86,13 @@ int server() {
 
         string encryResult; // 加密结果
         des.Encry(sMsg, DES_KEY, encryResult); // 加密
-        cout<<"encryResult = "<<encryResult<<endl;
         memset(sMsg, '\0', MSG_SIZE);
         for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
             sMsg[i] = encryResult[i];
         }
         sMsg[encryResult.size()] = '\0';
-
-        if(send(fd_client, sMsg, MAX_LINE, sizeof(sMsg)) <= 0) { // （6）send将服务器的消息发给客户端
+        
+        if(send(fd_client, sMsg, strlen(sMsg), 0) <= 0) { // （6）send将服务器的消息发给客户端
             perror("server send err");
             return SERVER_SEND_ERR;
         }

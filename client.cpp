@@ -72,8 +72,12 @@ int client() {
             cMsg[i] = encryResult[i];
         }
         cMsg[encryResult.size()] = '\0';
+        
+        cout<<"test cMsg = "<<cMsg<<endl;
+        cout<<"encryResult size = "<<encryResult.length()<<endl;
+        cout<<"cMsg size = "<<strlen(cMsg)<<endl;
 
-        if(send(fd_skt, cMsg, strlen(cMsg), 0) < 0) { // （3）send，客户端向服务端发消息
+        if (send(fd_skt, cMsg, strlen(cMsg), 0) < 0) { // （3）send，客户端向服务端发消息
             perror("client send err");
             return CLIENT_SEND_ERR;
         }
@@ -86,7 +90,11 @@ int client() {
             return CLIENT_RECV_ERR;
         }
         sMsg[sLen] = '\0';
-        cout << "Receive message form <" << serverAddr.sin_addr.s_addr << ">: " << sMsg << endl;
+
+        string decryResult = "";
+        des.Decry(sMsg, DES_KEY, decryResult);
+
+        cout << "Receive message form <" << serverAddr.sin_addr.s_addr << ">: " << decryResult << endl;
     }
     close(fd_skt);
 }

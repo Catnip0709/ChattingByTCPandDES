@@ -24,8 +24,8 @@ vector<bool> CDesOperate::InitReplacementIP(vector<bool> input, int type) {
     return result;
 }
 
-// 数据处理
-vector< vector<bool> > CDesOperate::DataProcess(string text) {
+// 明文数据处理
+vector<vector<bool> > CDesOperate:: EncryDataProcess(string text) {
     vector<string> cuttedText; // 8个字母为一组的切割
     int groupNum = text.size() / 8;
     for (int i = 0; i < groupNum; i++) { // 按组压入
@@ -53,6 +53,43 @@ vector< vector<bool> > CDesOperate::DataProcess(string text) {
         vector<bool> tempBin;
         for (int j = 0; j < cuttedText[i].size(); j++) {
             vector<bool> tempBinPart = from10To2(cuttedText[i][j], 8);
+            tempBin.insert(tempBin.end(), tempBinPart.begin(), tempBinPart.end());
+        }
+        binText.push_back(tempBin);
+    }
+    return binText;
+}
+
+// 密文数据处理
+vector<vector<bool> > CDesOperate::DecryDataProcess(string text) {
+    vector<string> cuttedText; // 16个字母为一组的切割
+    int groupNum = text.size() / 16;
+    for (int i = 0; i < groupNum; i++) { // 按组压入
+        string tempText = "";
+        for (int j = 0; j < 16; j++) {
+            tempText.push_back(text[16 * i + j]);
+        }
+        cuttedText.push_back(tempText);
+    }
+    if (text.size() % 16 != 0) { // 末尾有小于16个字符
+        string tempText = "";
+        for (int i = groupNum * 16; i < text.size(); i++) {
+            tempText.push_back(text[i]);
+        }
+        // 将最后一组string补全为16个字符
+        for (int i = tempText.size(); i < 16; i++) {
+            tempText.push_back('\0');
+        }
+        cuttedText.push_back(tempText);
+    }
+
+    // 将每一组的8个字符转为16*4=64bit的二进制
+    // 1个字母 → 1个16进制 → 4bit
+    vector<vector<bool> > binText;
+    for (int i = 0; i < cuttedText.size(); i++) {
+        vector<bool> tempBin;
+        for (int j = 0; j < cuttedText[i].size(); j++) {
+            vector<bool> tempBinPart = from10To2(cuttedText[i][j] - 65, 4);
             tempBin.insert(tempBin.end(), tempBinPart.begin(), tempBinPart.end());
         }
         binText.push_back(tempBin);

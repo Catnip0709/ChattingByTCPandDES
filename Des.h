@@ -5,13 +5,14 @@ using namespace std;
 class CDesOperate {
 public:
     int Encry(string plainText, string key, string& encryResult);  // 加密函数
-    int Decry(string cipherText, string key, string& dncryResult); // 解密函数
+    int Decry(string cipherText, string key, string& decryResult); // 解密函数
 
 private:
     vector<bool> EncryPro(vector<bool> input, vector<vector<bool> > subKey); // 处理64bit的加密函数
     vector<bool> DecryPro(vector<bool> input, vector<vector<bool> > subKey); // 处理64bit的解密函数
 
-    vector< vector<bool> > DataProcess(string text); // 数据处理：string → bool
+    vector< vector<bool> > EncryDataProcess(string text); // 明文数据处理：string → bool
+    vector< vector<bool> > DecryDataProcess(string text); // 密文数据处理：string → bool
     vector<bool> KeyProcess(string key); // key处理：string → bool
 
     vector<bool> InitReplacementIP(vector<bool> input, int type); // 初始/逆初始置换IP

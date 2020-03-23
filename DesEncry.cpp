@@ -16,7 +16,7 @@ int CDesOperate::Encry(string plainText, string key, string& encryResult) {
     vector<bool> binKey = KeyProcess(key); // key预处理，string转vector<bool>
     vector< vector<bool> > subKey = MakeKey(binKey); // 生成子秘钥
 
-    vector< vector<bool> > binPlainText = DataProcess(plainText);
+    vector< vector<bool> > binPlainText = EncryDataProcess(plainText);
     vector< vector<bool> > binCipherText; //二进制结果
 
     for (int i = 0; i < binPlainText.size(); i++) { // 分组处理
@@ -26,12 +26,8 @@ int CDesOperate::Encry(string plainText, string key, string& encryResult) {
 
     //将2进制的加密结果分组，4个一组，转为16进制，再+65转为好输出的ascii码
     encryResult = "";
-    map<int, int> from10To16{ // 十进制转十六进制
-        {0,  0x00}, {1,  0x01}, {2,  0x02}, {3,  0x03},
-        {4,  0x04}, {5,  0x05}, {6,  0x06}, {7,  0x07},
-        {8,  0x08}, {9,  0x09}, {10, 0x0a}, {11, 0x0b},
-        {12, 0x0c}, {13, 0x0d}, {14, 0x0e}, {15, 0x0f},
-    };
+    int from10To16[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }; // 十进制转十六进制
     for (int i = 0; i < binCipherText.size(); i++) {
         int start = 0;
         while (start < 64) {
@@ -44,7 +40,7 @@ int CDesOperate::Encry(string plainText, string key, string& encryResult) {
     return SUCCESS;
 }
 
-vector<bool> CDesOperate::EncryPro(vector<bool> input, vector<vector<bool> > subKey) {
+vector<bool> CDesOperate:: EncryPro(vector<bool> input, vector<vector<bool> > subKey) {
     // 步骤1: 初始置换IP
     vector<bool> tempStep1 = InitReplacementIP(input, INIT_REPLACE_IP);
     map<string, vector<bool> > step1;
@@ -53,6 +49,7 @@ vector<bool> CDesOperate::EncryPro(vector<bool> input, vector<vector<bool> > sub
         tempLeft.push_back(tempStep1[i]);
         tempRight.push_back(tempStep1[i + 32]);
     }
+
     step1["left"] = tempLeft;
     step1["right"] = tempRight;
 
