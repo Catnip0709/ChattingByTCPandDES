@@ -9,7 +9,7 @@ DES的16轮迭代的细节相关实现
 f函数 = 选择扩展运算E + 密钥加运算 + 选择压缩运算S + 置换P
 */
 
-vector<bool> CDesOperate:: fFunc(vector<bool> input, vector<bool> key) {
+vector<bool> CDesOperate::fFunc(vector<bool> input, vector<bool> key) {
     vector<bool> fStep1 = EBox(input);
     vector<bool> fStep2 = keyAddition(fStep1, key);
     vector<bool> fStep3 = selectCompressionOperation(fStep2);
@@ -17,9 +17,8 @@ vector<bool> CDesOperate:: fFunc(vector<bool> input, vector<bool> key) {
     return fStep4;
 }
 
-
 //（1）选择扩展运算(E盒)：将输入的右边32bit扩展成为48bit输出
-vector<bool> CDesOperate:: EBox(vector<bool> input) {
+vector<bool> CDesOperate::EBox(vector<bool> input) {
     vector<bool> output;
     for (int i = 0; i < 48; i++) {
         output.push_back(input[des_E[i] - 1]);
@@ -28,14 +27,14 @@ vector<bool> CDesOperate:: EBox(vector<bool> input) {
 }
 
 //（2）秘钥加运算：将选择扩展运算输出的48bit作为输入，与48bit的子密钥进行异或运算^
-vector<bool> CDesOperate:: keyAddition(vector<bool> input, vector<bool> key) {
+vector<bool> CDesOperate::keyAddition(vector<bool> input, vector<bool> key) {
     return XOR(input, key);
 }
 
 //（3）选择压缩运算
-vector<bool> CDesOperate:: selectCompressionOperation(vector<bool> input) {
+vector<bool> CDesOperate::selectCompressionOperation(vector<bool> input) {
     // 1、将密钥加运算的输出作为48bit输入，将其分为8组，每组6bit，
-    vector<vector<bool>> inputGroup;
+    vector<vector<bool> > inputGroup;
     for (int i = 0; i < 8; i++) {
         vector<bool> tempGroup;
         for (int j = 0; j < 6; j++) {
@@ -55,7 +54,7 @@ vector<bool> CDesOperate:: selectCompressionOperation(vector<bool> input) {
 }
 
 //（4）置换运算P
-vector<bool> CDesOperate:: replacementOp(vector<bool> input) {
+vector<bool> CDesOperate::replacementOp(vector<bool> input) {
     vector<bool> result;
     for (int i = 0; i < 32; i++) {
         result.push_back(input[des_P[i] - 1]);

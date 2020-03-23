@@ -74,12 +74,13 @@ int server() {
 
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n 
         cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
-        if(strcmp(sMsg, "quit\n") == 0){
+        if(strcmp(sMsg, "quit\n") == 0) {
             break;
         }
 
         string encryResult; // 加密结果
         des.Encry(sMsg, DES_KEY, encryResult); // 加密
+        cout<<"encryResult = "<<encryResult<<endl;
         memset(sMsg, '\0', MSG_SIZE);
         for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
             sMsg[i] = encryResult[i];
