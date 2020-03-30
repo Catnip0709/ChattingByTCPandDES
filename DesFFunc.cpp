@@ -4,11 +4,7 @@
 #include "HelpFunc.h"
 using namespace std;
 
-/*
-DES的16轮迭代的细节相关实现
-f函数 = 选择扩展运算E + 密钥加运算 + 选择压缩运算S + 置换P
-*/
-
+// f函数 = 选择扩展运算E + 密钥加运算 + 选择压缩运算S + 置换P
 vector<bool> CDesOperate::fFunc(vector<bool> input, vector<bool> key) {
     vector<bool> fStep1 = EBox(input);
     vector<bool> fStep2 = keyAddition(fStep1, key);
