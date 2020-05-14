@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <string>
 #include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
@@ -54,14 +55,13 @@ int client() {
     }
 
     cout << "Connect Success! \nBegin to chat..." << endl;
-
+    cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n
     while(1) {
         memset(cMsg, 0, sizeof(cMsg));
         memset(sMsg, 0, sizeof(sMsg));
 
-        cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n
 	    cin.getline(cMsg, sizeof(cMsg)); // 不用cin，因为不能含空格
-        if(strcmp(cMsg, "quit\n") == 0){
+        if (strcmp(cMsg, "quit") == 0) {
             break;
         }
         
@@ -86,7 +86,7 @@ int client() {
         int sLen = recv(fd_skt, sMsg, sizeof(sMsg),0); // （4） recv，接收服务器发来的消息
         if(sLen <= 0) { 
             perror("client recv err");
-            return CLIENT_RECV_ERR;
+            break;
         }
         sMsg[sLen] = '\0';
 
@@ -96,8 +96,9 @@ int client() {
             return DES_DECRY_ERR;
         }
 
-        cout << "Receive message form <" << ntohl(serverAddr.sin_addr.s_addr) << ">: " 
+        cout << "Receive message from <" << ntohl(serverAddr.sin_addr.s_addr) << ">: " 
              << decryResult << endl;
     }
-    close(fd_skt);
+    cout << "--- client end ---" << endl;
+    close(fd_skt); // 服务器会recv err: SUCCESS，从而结束连接
 }

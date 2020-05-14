@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <string>
 #include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
@@ -42,11 +43,9 @@ int server() {
         perror("server listen err");
         return SERVER_LISTEN_ERR;
     }
-    cout << "Listening..." << endl;
-
+    
     while(1) {
-        memset(cMsg, 0, sizeof(cMsg));
-        memset(sMsg, 0, sizeof(sMsg));
+        cout << "Listening..." << endl;
 
         struct sockaddr_in clientAddr;
         socklen_t length = sizeof(clientAddr);
@@ -63,54 +62,66 @@ int server() {
         cout << "server: got connection from " << ntohl(clientAddr.sin_addr.s_addr)
              << ", port " << PORT
              << ", socket" << fd_client << endl;
-
-        int cLen = recv(fd_client, cMsg, sizeof(cMsg), 0); // （5）read将接收到的客户端消息存在cMsg中
-        if (cLen <= 0) {
-            perror("server recv err");
-            return SERVER_RECV_ERR;
-        }
-        cMsg[cLen] = '\0';
-
-        string decryResult = "";
-        if (des.Decry(cMsg, DES_KEY, decryResult) != 0) { //解密
-            perror("decry err");
-            return DES_DECRY_ERR;
-        }
-
-        cout << "Receive message form <" << ntohl(clientAddr.sin_addr.s_addr) << ">: "
-             << decryResult << endl;
-
+        
         cin.ignore(1024,'\n'); // 去除上一个cin残留在缓冲区的\n 
-        cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
-        if(strcmp(sMsg, "quit\n") == 0) {
-            break;
-        }
-        
-        cout << "Send message to <" << ntohl(clientAddr.sin_addr.s_addr) << ">: " 
-             << sMsg << endl;
+        while(1) { // 与当前客户端循环通信
+            memset(cMsg, 0, sizeof(cMsg));
+            memset(sMsg, 0, sizeof(sMsg));
+            int cLen = recv(fd_client, cMsg, sizeof(cMsg), 0); // （5）read将接收到的客户端消息存在cMsg中
+            if (cLen <= 0) {
+                perror("server recv err");
+                break;
+            }
+            cMsg[cLen] = '\0';
 
-        string encryResult; // 加密结果
-        if (des.Encry(sMsg, DES_KEY, encryResult) != 0) { // 加密
-            perror("encry err");
-            return DES_ENCRY_ERR;
-        }
-        memset(sMsg, '\0', MSG_SIZE);
-        for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
-            sMsg[i] = encryResult[i];
-        }
-        sMsg[encryResult.size()] = '\0';
-        
-        if(send(fd_client, sMsg, strlen(sMsg), 0) <= 0) { // （6）send将服务器的消息发给客户端
-            perror("server send err");
-            return SERVER_SEND_ERR;
-        }
-        // recv和send的返回值：
-        // >0表示成功，返回实际发送或接受的字节数
-        // =0表示超时，对方主动关闭了连接过程
-        // <0出错
+            string decryResult = "";
+            if (des.Decry(cMsg, DES_KEY, decryResult) != 0) { //解密
+                perror("decry err");
+                return DES_DECRY_ERR;
+            }
 
+            cout << "Receive message from <" << ntohl(clientAddr.sin_addr.s_addr) << ">: "
+                << decryResult << endl;
+
+            cin.getline(sMsg, sizeof(sMsg)); // 不用cin，因为不能含空格
+            if(strcmp(sMsg, "quit") == 0) {
+                break;
+            }
+            
+            cout << "Send message to <" << ntohl(clientAddr.sin_addr.s_addr) << ">: " 
+                << sMsg << endl;
+
+            string encryResult; // 加密结果
+            if (des.Encry(sMsg, DES_KEY, encryResult) != 0) { // 加密
+                perror("encry err");
+                return DES_ENCRY_ERR;
+            }
+            memset(sMsg, '\0', MSG_SIZE);
+            for (int i = 0; i < encryResult.length(); i++) { // 加密结果string转char[]
+                sMsg[i] = encryResult[i];
+            }
+            sMsg[encryResult.size()] = '\0';
+            
+            if(send(fd_client, sMsg, strlen(sMsg), 0) <= 0) { // （6）send将服务器的消息发给客户端
+                perror("server send err");
+                return SERVER_SEND_ERR;
+            }
+            // recv和send的返回值：
+            // >0 表示成功，返回实际发送或接受的字节数
+            // =0 表示超时，对方主动关闭了连接过程
+            // <0 出错
+        }
         close(fd_client);
+        
+        cout << "当前客户端已结束通信，是否继续等待其他客户端？（1 - 是， 0 - 否）" << endl;
+        bool isContinue = false;
+        cin >> isContinue;
+        if (!isContinue) {
+           break;
+        }
     }
+    
+    cout << "-- server end --" << endl;
     close(fd_skt);
     return SUCCESS;
 }
